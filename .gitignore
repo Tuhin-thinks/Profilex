@@ -133,4 +133,4 @@ dist
 # project specific
 # ------------------------------
 uploads/*
-.vscode/
+.vscode
