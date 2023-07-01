@@ -11,5 +11,5 @@ const v1Routes = require('./routes/v1');
 app.use('/api/v1', v1Routes);
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT} ... ${new Date()}`);
 });
