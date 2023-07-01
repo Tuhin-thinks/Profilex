@@ -1,6 +1,9 @@
 const { fileUpload } = require('../../config');
 const { TempFileModel } = require('../../models/TempModel');
 
+/**
+ * Controller to upload resume file
+ */
 const uploadResumeFile = async (req, res) => {
     await fileUpload(req, res, (err) => {
         if (err) {
@@ -24,6 +27,13 @@ const uploadResumeFile = async (req, res) => {
     return res.status(200).json({ message: 'File uploaded successfully' });
 };
 
+/**
+ * Controller to analyze resume file
+ * TODO: write code to analyze the resume file
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ **/
 const analyzeResumeFile = async (req, res) => {
     const tempFileId = req.cookies.tempFileId;
     const tempFile = await TempFileModel.findById(tempFileId);
