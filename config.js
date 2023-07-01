@@ -1,7 +1,13 @@
+const fs = require('fs');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+
+const RESUME_UPLOAD_PATH = path.resolve(__dirname, './uploads');
+if (!fs.existsSync(RESUME_UPLOAD_PATH)) {
+    fs.mkdirSync(RESUME_UPLOAD_PATH);
+}
 
 const connectDB = async () => {
     try {
@@ -19,7 +25,7 @@ const connectDB = async () => {
 const fileUpload = async (req, res, callback) => {
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            cb(null, './uploads');
+            cb(null, RESUME_UPLOAD_PATH);
         },
         filename: (req, file, cb) => {
             const ext = path.extname(file.originalname);
