@@ -8,8 +8,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const v1Routes = require('./routes/v1');
+const { connectDB } = require('./config');
+
 app.use('/api/v1', v1Routes);
 
 app.listen(PORT, () => {
+    // connect to the database
+    connectDB();
+
     console.log(`Server running on port ${PORT} ... ${new Date()}`);
 });
