@@ -1,8 +1,8 @@
 const getUserById = async (req, res, next) => {
     try {
-        const { userName } = req.body;
+        const { userId } = req.params;
 
-        res.status(200).json({ userName });
+        res.status(200).json({ userId });
     } catch (error) {
         next(error);
     }

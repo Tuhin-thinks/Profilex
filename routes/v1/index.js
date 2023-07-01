@@ -3,8 +3,9 @@ const router = express.Router();
 
 const userRouter = require('./userRouter');
 
-router.use('/', (req, res) => {
-    res.status(200).json({ message: 'Connected to API!' });
+// create a default route
+router.get('/', (req, res) => {
+    res.status(200).json({ message: 'Welcome to the API' });
 });
 
 router.use('/users', userRouter);
