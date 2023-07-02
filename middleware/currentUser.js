@@ -9,19 +9,17 @@ const jwt = require('jsonwebtoken');
  */
 const currentUser = (req, res, next) => {
     const bearer_token = req.headers.authorization;
-    jwt.verify(bearer_token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) {
+    if (bearer_token) {
+        const decoded = jwt.verify(bearer_token, process.env.JWT_SECRET);
+        if (decoded) {
+            req.user = decoded;
+            return next();
+        } else {
             return res
                 .status(401)
                 .json({ message: 'Unauthorized User Request' });
         }
-        req.user = decoded;
-    });
-
-    if (!req.user) {
-        return res.status(401).json({ message: 'Unauthorized User Request' });
     }
-    next();
 };
 
 module.exports = currentUser;

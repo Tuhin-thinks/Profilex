@@ -8,7 +8,12 @@ const currentUser = require('../../middleware/currentUser');
 /**
  * Endpoint to accept resume pdf or text file.
  */
-router.post('/upload', fileUpload, resumeAnalyzeController.uploadResumeFile);
+router.post(
+    '/upload',
+    fileUpload,
+    currentUser,
+    resumeAnalyzeController.uploadResumeFile
+);
 router.get('/suggestions', currentUser, resumeAnalyzeController.getSuggestions);
 
 module.exports = router;

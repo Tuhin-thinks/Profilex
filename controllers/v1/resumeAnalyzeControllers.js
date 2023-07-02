@@ -8,9 +8,7 @@ const { analyzeResume } = require('../../modules/resumeAnalysis/analyzeResume');
  * Controller to upload resume file
  */
 const uploadResumeFile = async (req, res) => {
-    const userId =
-        req.user?._id ||
-        (await User.findOne({ email: 'guest-user@mail.com' }))._id;
+    const userId = req.user._id;
     const filepath = req.file.path;
 
     const tempFile = new TempFileModel({
@@ -39,7 +37,9 @@ const uploadResumeFile = async (req, res) => {
  * @returns
  **/
 const getSuggestions = async (req, res) => {
-    const tempFileId = await User.findOne({ email: req.user.email }).exec();
+    const tempFileId = (
+        await User.findById(req.user._id, { uploadedFileId: 1 })
+    ).uploadedFileId;
     if (!tempFileId) {
         return res.status(400).json({ message: 'File not found' });
     }

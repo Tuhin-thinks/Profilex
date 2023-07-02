@@ -1,5 +1,9 @@
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+
 const { User } = require('../../models/UserModel');
+const { TempFileModel } = require('../../models/TempModel');
 
 const signup = async (req, res) => {
     const { email, email_verified, given_name, name, locale, picture, sub } =
@@ -14,9 +18,9 @@ const signup = async (req, res) => {
         picture,
     };
     const result = await saveUser(user);
-
+    const uploadedUserId = result._id;
     const token = jwt.sign(
-        { ...result, _id: undefined, __v: undefined },
+        { ...result, id: uploadedUserId, __v: undefined },
         process.env.JWT_SECRET,
         {
             expiresIn: '24h',
@@ -39,7 +43,16 @@ const authUser = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-    req.session.destroy();
+    const userId = req.user._id;
+    const allTempFiles = await TempFileModel.find({
+        userId: new mongoose.Types.ObjectId(userId),
+    });
+    await userDataCleanUp(allTempFiles.map((item) => item._doc.path));
+
+    await TempFileModel.deleteMany({
+        userId: { $in: allTempFiles.map((item) => item._doc._id) },
+    });
+
     res.status(200).json({
         message: 'User logged out successfully',
     });
@@ -63,6 +76,15 @@ const saveUser = async (user) => {
 
     console.log('User already exists: ', existingUser); // TODO: remove this once testing is done.
     return existingUser._doc;
+};
+
+const userDataCleanUp = async (tempFilePaths) => {
+    await Promise.all(
+        tempFilePaths.map((filePath) => {
+            console.log('filePath: ', filePath);
+            if (fs.existsSync(filePath)) return fs.rm(filePath);
+        })
+    );
 };
 
 module.exports = {

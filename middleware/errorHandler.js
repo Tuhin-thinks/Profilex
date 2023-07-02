@@ -19,12 +19,9 @@ const errorHandler = (err, req, res, next) => {
     if (err instanceof SyntaxError) {
         errorResponse.message = 'Invalid JSON';
         res.status(400);
-    } else if (err instanceof CustomError) {
-        errorResponse.message = err.message;
-        res.status(err.statusCode);
     } else {
         // Handle other types of errors
-        res.status(500);
+        res.status(500).send(errorResponse);
     }
 
     // Send the error response

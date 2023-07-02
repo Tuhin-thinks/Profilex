@@ -4,19 +4,14 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 const errorHandler = require('./middleware/errorHandler');
-const jwt = require('jsonwebtoken');
 
 const { PORT } = process.env;
 
 // express middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-corsConfig = {
-    origin: '*',
-    credentials: true,
-};
-app.use(cors(corsConfig));
-app.options('*', cors(corsConfig));
+app.use(cors());
+app.options('*', cors());
 
 const v1Routes = require('./routes/v1');
 const { connectDB, initGuestUser } = require('./config');
