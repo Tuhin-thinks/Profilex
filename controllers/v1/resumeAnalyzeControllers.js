@@ -1,6 +1,8 @@
-const path = require('path');
+const fs = require('fs');
 const { TempFileModel } = require('../../models/TempModel');
 const { User } = require('../../models/UserModel');
+const { parseResumePDF } = require('../../modules/resumeAnalysis/parseResume');
+const { analyzeResume } = require('../../modules/resumeAnalysis/analyzeResume');
 
 /**
  * Controller to upload resume file
@@ -30,22 +32,28 @@ const uploadResumeFile = async (req, res) => {
  * @param {*} res
  * @returns
  **/
-const analyzeResumeFile = async (req, res) => {
+const getSuggestions = async (req, res) => {
     const tempFileId = req.session.tempFileId;
-    if (!tempFileId || !path.existsSync(tempFileId)) {
+    if (!tempFileId) {
         return res.status(400).json({ message: 'File not found' });
     }
     const tempFile = await TempFileModel.findById(tempFileId);
-    if (!tempFile) {
+    if (!tempFile || !fs.existsSync(tempFile.path)) {
         return res.status(400).json({ message: 'Invalid file path' });
     }
 
     // TODO: write code to analyze the resume file
+    const textData = await parseResumePDF(tempFile.path);
 
-    return res.status(200).json({ message: 'File analyzed successfully' });
+    const suggestionText = await analyzeResume(textData);
+
+    return res.status(200).json({
+        message: 'File analyzed successfully',
+        suggestionText: suggestionText,
+    });
 };
 
 module.exports = {
     uploadResumeFile,
-    analyzeResumeFile,
+    getSuggestions,
 };
