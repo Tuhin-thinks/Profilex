@@ -53,10 +53,13 @@ const initGuestUser = async () => {
         return;
     } else {
         const guestUser = new User({
+            sub: 'guest',
             email: 'guest-user@mail.com',
+            email_verified: false,
+            given_name: 'Guest',
             name: 'Guest User',
-            isGuest: true,
-            googleId: 'guest-user',
+            locale: 'en_In',
+            picture: '',
         });
         await guestUser.save();
         console.log('Guest user initialized');

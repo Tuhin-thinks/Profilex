@@ -1,70 +1,56 @@
-const passport = require('passport');
 const { User } = require('../../models/UserModel');
 
-const authGoogle = passport.authenticate('google', {
-    scope: ['profile', 'email'],
-});
+const signup = async (req, res) => {
+    const { email, email_verified, given_name, name, locale, picture, sub } =
+        req.body;
+    const user = {
+        sub,
+        email,
+        email_verified,
+        given_name,
+        name,
+        locale,
+        picture,
+    };
+    const result = await saveUser(user);
+    // TODO: Check what is inside the result object
+    req.session.user = { ...result, _id: undefined, __v: undefined };
 
-GOOGLE_AUTH_SUCCESS_MESSAGE = 'Google authentication successful';
-GOOGLE_AUTH_FAILURE_MESSAGE = 'Google authentication failed';
-
-/**
- * This function is called when the user is redirected back to the application from Google.
- * Typically, this endpoint should be hit when user click on the "Sign in with Google" button.
- */
-const authGoogleCallback = passport.authenticate('google', {
-    failureRedirect: '/api/v1/auth/google/failure',
-    successRedirect: '/api/v1/auth/google/success',
-});
-
-/**
- * This function is called when the user is successfully authenticated by Google.
- * @param {Object} req
- * @param {Object} res
- */
-const authGoogleSuccess = async (req, res) => {
-    // get the user from req.user
-    const { user } = req;
-
-    // save the user in the database
-    await saveUser(user);
-
-    // create a token
-    const token = user.generateAuthToken();
-    // set the token in a cookie
-    res.cookie('jwt', token, { httpOnly: true });
-    // send the user as response
-    res.status(200).json({ user, message: GOOGLE_AUTH_SUCCESS_MESSAGE });
+    res.status(200).json({
+        message: 'User created successfully',
+        user: result,
+    });
 };
 
-const authGoogleFailure = (req, res) => {
-    console.warn(GOOGLE_AUTH_FAILURE_MESSAGE);
-    res.status(401).json({ message: GOOGLE_AUTH_FAILURE_MESSAGE });
+const authUser = async (req, res) => {
+    const user = req.user; // obtained from middleware
+    res.status(200).json({
+        message: 'User authenticated successfully',
+        user: user,
+    });
 };
-
 // ------------------------------ Helper functions ------------------------------
 /**
  * Saves the user in the database.
- * @param {Object} user - The user object returned by Google OAuth.
+ * @param {Object} user - The user object
  */
 const saveUser = async (user) => {
-    const exitingUser = await User.findOne({ email: user.email }); // TODO: check if this works, or findOne supports chaining using .then() or we need .exec().
-    if (!exitingUser) {
+    const existingUser = await User.findOne({ email: user.email }); // TODO: check if this works, or findOne supports chaining using .then() or we need .exec().
+    if (!existingUser) {
         // save the user in the database
-        const newUser = new User({
-            name: user.name,
-            email: user.email,
-            googleId: user.googleId,
-        });
-        await newUser.save();
+        const newUser = new User(user);
+        const result = await newUser.save();
 
         console.log('New user created: ', newUser); // TODO: remove this once testing is done.
+
+        return result._doc;
     }
+
+    console.log('User already exists: ', existingUser); // TODO: remove this once testing is done.
+    return existingUser._doc;
 };
 
 module.exports = {
-    authGoogle,
-    authGoogleCallback,
-    authGoogleSuccess,
-    authGoogleFailure,
+    signup,
+    authUser,
 };

@@ -2,11 +2,15 @@ const express = require('express');
 const cookieSession = require('cookie-session');
 require('dotenv').config();
 const app = express();
+const errorHandler = require('./middleware/errorHandler');
 
 const { PORT } = process.env;
 
+// express middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// cookie session middleware
 app.use(
     cookieSession({
         name: 'session',
@@ -25,7 +29,7 @@ const { connectDB, initGuestUser } = require('./config');
 
 app.use('/api/v1', v1Routes);
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
     // connect to the database
     await connectDB();
 
@@ -34,3 +38,6 @@ app.listen(PORT, async () => {
 
     console.log(`Server running on port ${PORT} ... ${new Date()}`);
 });
+
+// error handler middleware
+app.use(errorHandler);
