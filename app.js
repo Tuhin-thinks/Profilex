@@ -4,32 +4,19 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 const errorHandler = require('./middleware/errorHandler');
+const jwt = require('jsonwebtoken');
 
 const { PORT } = process.env;
 
 // express middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-    cors({
-        origin: 'tops-grass-production.up.railway.app',
-        credentials: true,
-    })
-);
-
-// cookie session middleware
-app.use(
-    cookieSession({
-        name: 'session',
-        keys: [
-            process.env.COOKIE_KEY1, // cookie key 1
-            process.env.COOKIE_KEY2, // cookie key 2
-        ],
-
-        // Cookie Options
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    })
-);
+corsConfig = {
+    origin: '*',
+    credentials: true,
+};
+app.use(cors(corsConfig));
+app.options('*', cors(corsConfig));
 
 const v1Routes = require('./routes/v1');
 const { connectDB, initGuestUser } = require('./config');

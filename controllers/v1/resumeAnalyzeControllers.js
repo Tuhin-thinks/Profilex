@@ -20,7 +20,13 @@ const uploadResumeFile = async (req, res) => {
         userId: userId,
     });
     const result = await tempFile.save();
-    req.session.tempFileId = result._id; // TODO: check if this works
+    // req.session.tempFileId = result._id; // TODO: check if this works
+
+    // store the _id for the next request
+    await User.updateOne(
+        { email: req.user.email },
+        { uploadedFileId: result._id }
+    );
 
     return res.status(200).json({ message: 'File uploaded successfully' });
 };
@@ -33,7 +39,7 @@ const uploadResumeFile = async (req, res) => {
  * @returns
  **/
 const getSuggestions = async (req, res) => {
-    const tempFileId = req.session.tempFileId;
+    const tempFileId = await User.findOne({ email: req.user.email }).exec();
     if (!tempFileId) {
         return res.status(400).json({ message: 'File not found' });
     }

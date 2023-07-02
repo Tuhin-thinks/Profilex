@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const { User } = require('../../models/UserModel');
 
 const signup = async (req, res) => {
@@ -13,12 +14,19 @@ const signup = async (req, res) => {
         picture,
     };
     const result = await saveUser(user);
-    // TODO: Check what is inside the result object
-    req.session.user = { ...result, _id: undefined, __v: undefined };
+
+    const token = jwt.sign(
+        { ...result, _id: undefined, __v: undefined },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: '24h',
+        }
+    );
 
     res.status(200).json({
         message: 'User created successfully',
         user: result,
+        token: token,
     });
 };
 
