@@ -45,11 +45,11 @@ const getSuggestions = async (req, res) => {
     // TODO: write code to analyze the resume file
     const textData = await parseResumePDF(tempFile.path);
 
-    const suggestionText = await analyzeResume(textData);
+    const suggestionsArray = await analyzeResume(textData);
 
     return res.status(200).json({
         message: 'File analyzed successfully',
-        suggestionText: suggestionText,
+        suggestions: suggestionsArray,
     });
 };
 

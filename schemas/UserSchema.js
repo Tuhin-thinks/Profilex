@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    is_pro: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
 });
 
 module.exports = {
