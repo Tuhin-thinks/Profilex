@@ -15,7 +15,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    // Add more fields as needed
+    isGuest: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
 });
 
 module.exports = {

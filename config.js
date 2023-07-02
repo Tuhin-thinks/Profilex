@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { User } = require('./models/UserModel');
 
 const RESUME_UPLOAD_PATH = path.resolve(__dirname, './uploads');
 if (!fs.existsSync(RESUME_UPLOAD_PATH)) {
@@ -39,7 +40,31 @@ const fileUpload = async (req, res, callback) => {
     upload(req, res, callback);
 };
 
+/**
+ * Initialize guest user in mongodb
+ */
+const initGuestUser = async () => {
+    // check if guest user already exists
+    const guestUserExists = await User.findOne({
+        email: 'guest-user@mail.com',
+    });
+    if (guestUserExists) {
+        console.log('Guest user already exists');
+        return;
+    } else {
+        const guestUser = new User({
+            email: 'guest-user@mail.com',
+            name: 'Guest User',
+            isGuest: true,
+            googleId: 'guest-user',
+        });
+        await guestUser.save();
+        console.log('Guest user initialized');
+    }
+};
+
 module.exports = {
     connectDB,
     fileUpload,
+    initGuestUser,
 };

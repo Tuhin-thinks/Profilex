@@ -1,28 +1,31 @@
-const { fileUpload } = require('../../config');
+const path = require('path');
 const { TempFileModel } = require('../../models/TempModel');
+const { User } = require('../../models/UserModel');
 
 /**
  * Controller to upload resume file
  */
 const uploadResumeFile = async (req, res) => {
-    await fileUpload(req, res, (err) => {
-        if (err) {
-            res.status(400).json({ message: 'Error uploading file' });
-        } else {
-            res.status(200).json({ message: 'File uploaded successfully' });
-        }
-    });
-
+    // await fileUpload(req, res, (err) => {
+    //     if (err) {
+    //         res.status(400).json({ message: 'Error uploading file' });
+    //     } else {
+    //         res.status(200).json({ message: 'File uploaded successfully' });
+    //     }
+    // });
+    const userId =
+        req.user?._id ||
+        (await User.findOne({ email: 'guest-user@mail.com' }))._id;
     const filepath = req.file.path;
 
     const tempFile = new TempFileModel({
         filename: req.file.filename,
         path: filepath,
         size: req.file.size,
-        userId: req.user._id,
+        userId: userId,
     });
     const result = await tempFile.save();
-    req.cookies.tempFileId = result._id; // TODO: check if this works
+    req.session.tempFileId = result._id; // TODO: check if this works
 
     return res.status(200).json({ message: 'File uploaded successfully' });
 };
@@ -35,10 +38,13 @@ const uploadResumeFile = async (req, res) => {
  * @returns
  **/
 const analyzeResumeFile = async (req, res) => {
-    const tempFileId = req.cookies.tempFileId;
+    const tempFileId = req.session.tempFileId;
+    if (!tempFileId || !path.existsSync(tempFileId)) {
+        return res.status(400).json({ message: 'File not found' });
+    }
     const tempFile = await TempFileModel.findById(tempFileId);
     if (!tempFile) {
-        return res.status(400).json({ message: 'File not found' });
+        return res.status(400).json({ message: 'Invalid file path' });
     }
 
     // TODO: write code to analyze the resume file
