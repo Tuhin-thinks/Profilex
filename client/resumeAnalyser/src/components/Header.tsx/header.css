@@ -1,0 +1,18 @@
+.header {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  padding-right: 1rem;
+}
+.header a {
+  text-decoration: none;
+  color: black;
+}
+.header a:active {
+  color: black;
+}
+.logout {
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+}
