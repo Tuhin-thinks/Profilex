@@ -29,6 +29,13 @@ const authUser = async (req, res) => {
         user: user,
     });
 };
+
+const logout = async (req, res) => {
+    req.session.destroy();
+    res.status(200).json({
+        message: 'User logged out successfully',
+    });
+};
 // ------------------------------ Helper functions ------------------------------
 /**
  * Saves the user in the database.
@@ -53,4 +60,5 @@ const saveUser = async (user) => {
 module.exports = {
     signup,
     authUser,
+    logout,
 };
