@@ -13,6 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.options('*', cors());
 
+// Code aisa kro ki char log soche ye kya code banaya hai....
+// enjoy : )
+
 const v1Routes = require('./routes/v1');
 const { connectDB, initGuestUser } = require('./config');
 
