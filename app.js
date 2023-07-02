@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: 'localhost:3000',
+        origin: 'tops-grass-production.up.railway.app',
         credentials: true,
     })
 );
